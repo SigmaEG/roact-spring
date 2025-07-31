@@ -100,9 +100,15 @@ function SpringValue:_update(props)
 		anim.fromValues = table.clone(anim.lastPosition)
 
 		if not self._connection then
-			self._connection = RunService.RenderStepped:Connect(function(dt)
-				self:advance(dt)
-			end)
+			if (RunService:IsServer()) then
+				self._connection = RunService.Heartbeat:Connect(function(dt)
+	   				self:advance(dt)
+	   			end)
+	      		elseif (RunService:IsClient()) then
+	        		self._connection = RunService.RenderStepped:Connect(function(dt)
+  					self:advance(dt)
+   				end)
+  			end
 		end
 
 		self.onComplete:Wait()
